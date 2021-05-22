@@ -69,7 +69,7 @@ if __name__ == '__main__':
     print(f"time_spec: {env.time_step_spec()}")
 
     # Hyperparameters
-    num_iterations = int(5e5) # @param {type:"number"}
+    num_iterations = int(1e4) # @param {type:"number"}
     collect_episodes_per_iteration = int(10)  # @param {type:"integer"}
     _storeFullEpisodes = collect_episodes_per_iteration  # @param {type:"integer"}
     # replayBufferCapacity = int(_storeFullEpisodes * episodeEndSteps * batchSize)
