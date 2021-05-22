@@ -37,7 +37,7 @@ import shutil
 import copy
 from typing import Tuple
 # Custom Modules
-# from CarRacingEnvClass import CarRacingEnv
+from CarRacingEnvClass import CarRacingEnv
 
 
 if __name__ == '__main__':
@@ -52,14 +52,14 @@ if __name__ == '__main__':
     # create environment and transfer it to Tensorflow version
     print('Creating environment ...')
     gamma = 0.999
-    env_name = "CarRacing-v0"
-    env = suite_gym.load(env_name)
-    # env = CarRacingEnv(gamma=gamma)
+    # env_name = "CarRacing-v0"
+    # env = suite_gym.load(env_name)
+    env = CarRacingEnv(gamma=gamma)
     env.reset()
     env = tf_py_environment.TFPyEnvironment(env)
 
-    evaluate_env = suite_gym.load(env_name)
-    # evaluate_env = CarRacingEnv(gamma=gamma)
+    # evaluate_env = suite_gym.load(env_name)
+    evaluate_env = CarRacingEnv(gamma=gamma)
     evaluate_env.reset()
     observation_spec = env.observation_spec()
     action_spec = env.action_spec()
@@ -69,8 +69,8 @@ if __name__ == '__main__':
     print(f"time_spec: {env.time_step_spec()}")
 
     # Hyperparameters
-    num_iterations = int(1e6) # @param {type:"number"}
-    collect_episodes_per_iteration = int(3)  # @param {type:"integer"}
+    num_iterations = int(5e5) # @param {type:"number"}
+    collect_episodes_per_iteration = int(10)  # @param {type:"integer"}
     _storeFullEpisodes = collect_episodes_per_iteration  # @param {type:"integer"}
     # replayBufferCapacity = int(_storeFullEpisodes * episodeEndSteps * batchSize)
     replayBufferCapacity = int(100000)  # @param {type:"integer"}
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     # so an actorDistributionNetwork is needed, not ones who directly return actions.
     actor_denseLayerParams = (512, 9)
     # actor_convLayerParams = [(tf.cast(64, tf.int32), tf.cast(16, tf.int32), tf.cast(5, tf.int32)), (tf.cast(64, tf.int32), tf.cast(16, tf.int32), tf.cast(5, tf.int32))]
-    actor_convLayerParams = [(int(32), (int(8), int(8)), int(4)), (int(64), (int(4), int(4)), int(2)), (int(64), (int(3), int(3)), int(1))]
+    actor_convLayerParams = critic_observationConvLayerParams = [(int(32), int(8), int(4)), (int(64), int(4), int(2)), (int(64), int(3), int(1))]
     actor_net = actor_distribution_network.ActorDistributionNetwork(
         input_tensor_spec=observation_spec,
         output_tensor_spec=action_spec,
@@ -138,8 +138,8 @@ if __name__ == '__main__':
     #     name='Critic Network'
     # )
     critic_observationConvLayerParams = [(int(32), int(8), int(4)), (int(64), int(4), int(2)), (int(64), int(3), int(1))]
-    critic_observationDenseLayerParams = (100,)
-    critic_commonDenseLayerParams = (int(200), int(200))
+    critic_observationDenseLayerParams = (512, 9)
+    critic_commonDenseLayerParams = (64, 8)
     critic_actionDenseLayerParams = (int(8),)
     critic_net = CriticNetwork(
         (observation_spec, action_spec),

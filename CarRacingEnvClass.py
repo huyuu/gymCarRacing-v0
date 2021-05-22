@@ -28,11 +28,12 @@ class CarRacingEnv(py_environment.PyEnvironment):
         # self.__env = suite_gym.load(env_name)
         self.__env = gym.make(env_name)
         self.dtype = dtype
-        self.gamma = gamma
+        self.gamma = float(gamma)
 
         self.__observationSpec = BoundedArraySpec(shape=(96, 96, 3), dtype=nu.int32, name='observation', minimum=0, maximum=255)
         self.__actionSpec = BoundedArraySpec(shape=(3,), dtype=dtype, name='action', minimum=nu.array([-1.,  0.,  0.], dtype=dtype), maximum=nu.array([1., 1., 1.], dtype=dtype))
         # self.__observationSpec = tf.cast(self.__env.observation_spec(), dtype=tf.int32)
+        self.__accumulatedReward = 0.0
 
 
     @classmethod
@@ -52,6 +53,7 @@ class CarRacingEnv(py_environment.PyEnvironment):
 
     # required
     def _reset(self):
+        self.__accumulatedReward = 0.0
         observation = self.__env.reset()
         return ts.restart(CarRacingEnv.castObservation(observation))
 
@@ -60,8 +62,10 @@ class CarRacingEnv(py_environment.PyEnvironment):
     def _step(self, action):
         observation, reward, done, info = self.__env.step(action)
         castedObservation = CarRacingEnv.castObservation(observation)
+        done = done or self.__accumulatedReward < -1000
 
         if done is True:
-            ts.termination(castedObservation, 0)
+            return ts.termination(castedObservation, 0.0)
         else:
-            ts.transition(castedObservation, reward=reward, discount=self.gamma)
+            self.__accumulatedReward += reward
+            return ts.transition(castedObservation, reward=reward, discount=self.gamma)
