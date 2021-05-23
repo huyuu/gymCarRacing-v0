@@ -194,9 +194,9 @@ if __name__ == '__main__':
                 action = [ float(a) for a in action_step.action ]
                 time_step = environment.step(action)
                 episode_return += time_step.reward
-            total_return += episode_return
+            total_return += float(episode_return)
         avg_return = total_return / num_episodes
-        return avg_return.numpy()[0]
+        return avg_return
 
     # Replay Buffer
     replay_buffer = tf_uniform_replay_buffer.TFUniformReplayBuffer(
