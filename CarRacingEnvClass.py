@@ -31,7 +31,7 @@ class CarRacingEnv(py_environment.PyEnvironment):
         self.gamma = float(gamma)
 
         self.__observationSpec = BoundedArraySpec(shape=(96, 96, 3), dtype=nu.int32, name='observation', minimum=0, maximum=255)
-        self.__actionSpec = BoundedArraySpec(shape=(3,), dtype=dtype, name='action', minimum=nu.array([-1.,  0.,  0.], dtype=dtype), maximum=nu.array([1., 1., 1.], dtype=dtype))
+        self.__actionSpec = BoundedArraySpec(shape=(3,), dtype=dtype, name='action', minimum=nu.array([-1.,  0.,  0.]), maximum=nu.array([1., 1., 1.]))
         # self.__observationSpec = tf.cast(self.__env.observation_spec(), dtype=tf.int32)
         self.__accumulatedReward = 0.0
 

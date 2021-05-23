@@ -52,14 +52,14 @@ if __name__ == '__main__':
     # create environment and transfer it to Tensorflow version
     print('Creating environment ...')
     gamma = 0.999
-    # env_name = "CarRacing-v0"
-    # env = suite_gym.load(env_name)
-    env = CarRacingEnv(gamma=gamma)
+    env_name = "CarRacing-v0"
+    env = suite_gym.load(env_name)
+    # env = CarRacingEnv(gamma=gamma)
     env.reset()
     env = tf_py_environment.TFPyEnvironment(env)
 
-    # evaluate_env = suite_gym.load(env_name)
-    evaluate_env = CarRacingEnv(gamma=gamma)
+    evaluate_env = suite_gym.load(env_name)
+    # evaluate_env = CarRacingEnv(gamma=gamma)
     evaluate_env.reset()
     observation_spec = env.observation_spec()
     action_spec = env.action_spec()
@@ -69,8 +69,8 @@ if __name__ == '__main__':
     print(f"time_spec: {env.time_step_spec()}")
 
     # Hyperparameters
-    num_iterations = int(1e4) # @param {type:"number"}
-    collect_episodes_per_iteration = int(10)  # @param {type:"integer"}
+    num_iterations = int(1e5) # @param {type:"number"}
+    collect_episodes_per_iteration = int(5)  # @param {type:"integer"}
     _storeFullEpisodes = collect_episodes_per_iteration  # @param {type:"integer"}
     # replayBufferCapacity = int(_storeFullEpisodes * episodeEndSteps * batchSize)
     replayBufferCapacity = int(100000)  # @param {type:"integer"}
@@ -179,8 +179,9 @@ if __name__ == '__main__':
     print('SAC Agent Created.')
 
     # Policies
-    evaluate_policy = tf_agent.policy
+    evaluate_policy = greedy_policy.GreedyPolicy(tf_agent.policy)
     collect_policy = tf_agent.collect_policy
+
 
     # Evaluation
     def compute_avg_return(environment, policy, num_episodes=5):
@@ -190,7 +191,8 @@ if __name__ == '__main__':
             episode_return = 0.0
             while not time_step.is_last():
                 action_step = policy.action(time_step)
-                time_step = environment.step(action_step.action)
+                action = [ float(a) for a in action_step.action ]
+                time_step = environment.step(action)
                 episode_return += time_step.reward
             total_return += episode_return
         avg_return = total_return / num_episodes
@@ -251,6 +253,7 @@ if __name__ == '__main__':
     _timeCost = (dt.datetime.now() - _startTime).total_seconds()
     print('All preparation is done (cost {:.3g} hours). Start training...'.format(_timeCost/3600.0))
     _startTimeFromStart = dt.datetime.now()
+    compute_avg_return(evaluate_env, evaluate_policy, validateEpisodes)
     for _ in range(num_iterations):
         _startTime = dt.datetime.now()
         # Collect a few steps using collect_policy and save to the replay buffer.
