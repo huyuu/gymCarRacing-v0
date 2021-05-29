@@ -2,6 +2,7 @@ import numpy as nu
 import pandas as pd
 import gym
 from matplotlib import pyplot as pl
+from time import sleep
 
 # https://gym.openai.com/envs/CarRacing-v0/
 # https://vigne-cla.com/9-19/#toc11
@@ -11,9 +12,9 @@ from matplotlib import pyplot as pl
 
 env = gym.make("CarRacing-v0")                          # GUI環境の開始(***)
 
-for episode in range(20):
+for episode in range(1):
   observation = env.reset()                             # 環境の初期化
-  for _ in range(5000):
+  for _ in range(100):
     env.render()                                        # レンダリング(画面の描画)
     action = env.action_space.sample()                  # 行動の決定
     observation, reward, done, info = env.step(action)  # 行動による次の状態の決定
